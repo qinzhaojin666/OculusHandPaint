@@ -1,18 +1,13 @@
 ﻿using UnityEngine;
+using Zenject;
 /// <summary>
 /// 適当にオブジェクト作ってアタッチ
 /// </summary>
 [RequireComponent(typeof(TrailRenderer))]
 public class PaintFunction : MonoBehaviour
 {
-    [SerializeField]
-    OVRHand m_oVRHand;
-
-    [SerializeField]
-    OVRSkeleton m_ovrSkeleton;
-
-    [SerializeField]
-    OVRHand.HandFinger m_handFingerType;
+    [Inject]
+    IInputProvider inputProvider;
 
     TrailRenderer m_tr;
 
@@ -31,11 +26,12 @@ public class PaintFunction : MonoBehaviour
 
     void Update()
     {
-        Vector3 indexTipPos = m_ovrSkeleton.Bones[(int)OVRSkeleton.BoneId.Hand_IndexTip].Transform.position;
-        this.gameObject.transform.position = indexTipPos;
+       
 
-        if (m_oVRHand.GetFingerPinchStrength(m_handFingerType) == 0)
+        if (inputProvider.OnInput())
         {
+            this.gameObject.transform.position = inputProvider.InputPos();
+            Debug.Log("ClickInput");
             m_tr.emitting = true;
         }
         else
