@@ -4,10 +4,12 @@ using UnityEngine.XR;
 
 namespace Hp
 {
+    /// <summary>
+    /// モジュールのインストーラー
+    /// </summary>
     public class HpInputInstaller : MonoInstaller<HpInputInstaller>
     {
-        [SerializeField]
-        GameObject handImput;
+        [SerializeField] private GameObject handImput;
 
         public override void InstallBindings()
         {
@@ -18,7 +20,7 @@ namespace Hp
                 .FromComponentOn(handImput)
                 .AsCached()
                 .When(_ => isOnDevice());
-          
+
             //実機無い時
             Container
                 .Bind<IHpInputModule>()

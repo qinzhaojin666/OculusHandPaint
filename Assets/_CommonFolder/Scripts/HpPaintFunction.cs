@@ -15,7 +15,7 @@ namespace Hp
 
         [SerializeField] private GameObject _paintTrailRendererPrefab;
 
-        [SerializeField] private GameObject _redoButtonObj, _undoButtonObj;
+        [SerializeField] private GameObject _redoButtonObj, _undoButtonObj,_paintButtonObj;
 
         [Inject] private IHpInputModule _inputModule;
 
@@ -31,6 +31,11 @@ namespace Hp
             //Undoボタンが押されたらFunctionステートを変更
             _undoButtonObj.OnTriggerEnterAsObservable()
                 .Subscribe(_ => { _paintFunctionState = HpPaintFunctionState.Undo; })
+                .AddTo(this);
+
+            //Undoボタンが押されたらFunctionステートを変更
+            _paintButtonObj.OnTriggerEnterAsObservable()
+                .Subscribe(_ => { _paintFunctionState = HpPaintFunctionState.Paint; })
                 .AddTo(this);
 
             //機能のステートに応じて処理を行う
@@ -50,7 +55,8 @@ namespace Hp
                             _paintFunctionState = HpPaintFunctionState.NoFunc;
                             break;
                         case HpPaintFunctionState.Paint:
-                            //Undo処理ここに書く
+                            //Paint処理ここに書く
+                            paint(x);
                             break;
                     }
                 })
@@ -59,15 +65,25 @@ namespace Hp
 
         private void paint(HpInputData data)
         {
+            GameObject tmpObj = new GameObject("tmp");
             switch (data.InputState)
             {
                 case HpInputState.InputDown:
+                    //今の状態をペイント機能に変更
+                    _paintFunctionState = HpPaintFunctionState.Paint;
                     //ペイントオブジェクトを生成
+                    tmpObj = Instantiate(_paintTrailRendererPrefab, data.InputPosition, Quaternion.identity);
+                    tmpObj.transform.parent = _paintTrailRendererParent;
                     break;
                 case HpInputState.Input:
-                //ペイントオブジェクトを追従
+                    //ペイントオブジェクトを入力位置に追従
+                    tmpObj.transform.position = data.InputPosition;
+                    break;
                 case HpInputState.NoInput:
+                    //ペイント機能を終了
+                    _paintFunctionState = HpPaintFunctionState.NoFunc;
                     //なんか書くことあれば
+                    tmpObj = null;
                     break;
             }
         }
