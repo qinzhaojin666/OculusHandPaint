@@ -13,7 +13,7 @@ namespace Hp
         {
             //実機上
             Container
-                .Bind<IHpInputProvider>()
+                .Bind<IHpInputModule>()
                 .To<HpHandInputProvider>()
                 .FromComponentOn(handImput)
                 .AsCached()
@@ -21,7 +21,7 @@ namespace Hp
           
             //実機無い時
             Container
-                .Bind<IHpInputProvider>()
+                .Bind<IHpInputModule>()
                 .To<HpClickInputProvider>()
                 .AsCached()
                 .When(_ => !isOnDevice());

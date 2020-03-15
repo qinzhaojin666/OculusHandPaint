@@ -1,11 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UniRx;
 
 namespace Hp
 {
     /// <summary>
-    /// Inputのモジュール　ハンドトラッキングの場合
+    /// ハンドトラッキング時の入力モジュール
     /// </summary>
-    public class HpHandInputProvider : MonoBehaviour, IHpInputProvider
+    public class HpHandInputProvider : MonoBehaviour, IHpInputModule
     {
         [SerializeField] private OVRHand _ovrHand;
 
@@ -15,25 +17,54 @@ namespace Hp
 
         [SerializeField] private OVRSkeleton.BoneId _boneId;
 
-        private float _minPinchStrengthValue = 0.6f;
-
         /// <summary>
-        /// 入力中のポジションを返す
+        /// 利用側で入力データを監視可能にする
         /// </summary>
-        /// <returns></returns>
-        public Vector3 InputPos()
-        {
-            return _ovrSkeleton.Bones[(int)_boneId].Transform.position;
-        }
+        public IObservable<HpInputData> InputDataObservable => _inputDataSubject;
 
-        /// <summary>
-        /// 任意のポーズでインプット中かどうかBool値を返す
-        /// </summary>
-        /// <returns></returns>
-        public bool OnInput()
+        private Subject<HpInputData> _inputDataSubject = new Subject<HpInputData>();
+
+        private HpInputData _inputData = new HpInputData();
+
+        private float _minPinchStrengthValue = 0.8f;
+
+        private bool _isInput;
+
+        private void Update()
         {
-            //曲げてるかどうかと曲げ方の度合い
-            return _ovrHand.GetFingerIsPinching(_handFingerType) && _ovrHand.GetFingerPinchStrength(_handFingerType) >= _minPinchStrengthValue;
+            //入力なし
+            _inputData.InputState = HpInputState.NoInput;
+
+            //指定した手のした座標を構造体にぶち込む
+            _inputData.InputPosition = _ovrSkeleton.Bones[(int)_boneId].Transform.position;
+
+            //PinchPoseできてるかどうか
+            float currentPinchStrength = _ovrHand.GetFingerPinchStrength(_handFingerType);
+            bool isPinching = _ovrHand.GetFingerIsPinching(_handFingerType);
+            bool isPinchPose = isPinching && currentPinchStrength >= _minPinchStrengthValue;
+
+            //入力中
+            if (isPinchPose && _isInput)
+            {
+                _isInput = true;
+                _inputData.InputState = HpInputState.Input;
+            }
+
+            //入力した瞬間
+            if (isPinchPose && _isInput == false)
+            {
+                _isInput = true;
+                _inputData.InputState = HpInputState.InputDown;
+            }
+
+            //ピンチポーズしてない
+            if (isPinchPose == false)
+            {
+                _isInput = false;
+            }
+
+            //構造体をのせてメッセージを発行
+            _inputDataSubject.OnNext(_inputData);
         }
     }
 }

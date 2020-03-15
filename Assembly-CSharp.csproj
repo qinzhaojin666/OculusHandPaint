@@ -64,11 +64,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_CommonFolder\Scripts\CustomInput.cs" />
+    <Compile Include="Assets\_CommonFolder\Scripts\Enum\HpInputState.cs" />
+    <Compile Include="Assets\_CommonFolder\Scripts\Enum\HpPaintFunctionState.cs" />
     <Compile Include="Assets\_CommonFolder\Scripts\HpClickInputProvider.cs" />
     <Compile Include="Assets\_CommonFolder\Scripts\HpHandInputProvider.cs" />
+    <Compile Include="Assets\_CommonFolder\Scripts\HpInputData.cs" />
     <Compile Include="Assets\_CommonFolder\Scripts\HpInputInstaller.cs" />
     <Compile Include="Assets\_CommonFolder\Scripts\HpPaintFunction.cs" />
-    <Compile Include="Assets\_CommonFolder\Scripts\IHpInputProvider.cs" />
+    <Compile Include="Assets\_CommonFolder\Scripts\IHpInputModule.cs" />
     <Compile Include="Assets\EditorExtension\CreateEditorFolder.cs" />
     <Compile Include="Assets\Oculus\AudioManager\Scenes\Scripts\TestScript.cs" />
     <Compile Include="Assets\Oculus\AudioManager\Scripts\Audio\AmbienceEmitter.cs" />

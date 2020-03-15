@@ -201,7 +201,7 @@ GameObject:
   - component: {fileID: 253311778}
   - component: {fileID: 253311777}
   m_Layer: 0
-  m_Name: Paint
+  m_Name: PaintFunction
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

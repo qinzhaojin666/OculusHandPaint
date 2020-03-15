@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using Zenject;
+using UniRx;
+using UniRx.Triggers;
 
 namespace Hp
 {
@@ -9,35 +11,64 @@ namespace Hp
     [RequireComponent(typeof(TrailRenderer))]
     public class HpPaintFunction : MonoBehaviour
     {
-        [Inject] private IHpInputProvider inputProvider;
+        [SerializeField] private Transform _paintTrailRendererParent;
 
-        private TrailRenderer m_tr;
+        [SerializeField] private GameObject _paintTrailRendererPrefab;
 
-        private void Reset()
-        {
-            m_tr = this.gameObject.GetComponent<TrailRenderer>();
-            m_tr.time = Mathf.Infinity;
-            m_tr.widthMultiplier = 0.01f;
-            m_tr.minVertexDistance = 0.01f;
-        }
+        [SerializeField] private GameObject _redoButtonObj, _undoButtonObj;
+
+        [Inject] private IHpInputModule _inputModule;
+
+        private HpPaintFunctionState _paintFunctionState;
 
         private void Start()
         {
-            m_tr = this.gameObject.GetComponent<TrailRenderer>();
+            //Redoボタンが押されたらFunctionステートを変更
+            _redoButtonObj.OnTriggerEnterAsObservable()
+                .Subscribe(_ => { _paintFunctionState = HpPaintFunctionState.Redo; })
+                .AddTo(this);
+
+            //Undoボタンが押されたらFunctionステートを変更
+            _undoButtonObj.OnTriggerEnterAsObservable()
+                .Subscribe(_ => { _paintFunctionState = HpPaintFunctionState.Undo; })
+                .AddTo(this);
+
+            //機能のステートに応じて処理を行う
+            _inputModule.InputDataObservable
+                .Subscribe(x =>
+                {
+                    switch (_paintFunctionState)
+                    {
+                        case HpPaintFunctionState.Redo:
+                            //Redo処理ここに書く
+                            //使い終わったら機能のステート未使用に戻す
+                            _paintFunctionState = HpPaintFunctionState.NoFunc;
+                            break;
+                        case HpPaintFunctionState.Undo:
+                            //Undo処理ここに書く
+                            //使い終わったら機能のステート未使用に戻す
+                            _paintFunctionState = HpPaintFunctionState.NoFunc;
+                            break;
+                        case HpPaintFunctionState.Paint:
+                            //Undo処理ここに書く
+                            break;
+                    }
+                })
+                .AddTo(this);
         }
 
-        private void Update()
+        private void paint(HpInputData data)
         {
-            if (inputProvider.OnInput())
+            switch (data.InputState)
             {
-                this.gameObject.transform.position = inputProvider.InputPos();
-                Debug.Log("OnInput");
-                m_tr.emitting = true;
-            }
-            else
-            {
-                m_tr.emitting = false;
-                Debug.Log("NoInput");
+                case HpInputState.InputDown:
+                    //ペイントオブジェクトを生成
+                    break;
+                case HpInputState.Input:
+                //ペイントオブジェクトを追従
+                case HpInputState.NoInput:
+                    //なんか書くことあれば
+                    break;
             }
         }
     }
