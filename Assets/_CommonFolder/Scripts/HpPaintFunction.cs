@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using Zenject;
 using UniRx;
-using UniRx.Triggers;
+using System.Collections.Generic;
+using OculusSampleFramework;
 
 namespace Hp
 {
@@ -15,28 +16,50 @@ namespace Hp
 
         [SerializeField] private GameObject _paintTrailRendererPrefab;
 
-        [SerializeField] private GameObject _redoButtonObj, _undoButtonObj,_paintButtonObj;
+        [SerializeField] private ButtonController _redoButtonObj, _undoButtonObj,_paintButtonObj;
 
         [Inject] private IHpInputModule _inputModule;
 
         private HpPaintFunctionState _paintFunctionState;
 
+        private GameObject _tmpObj;
+
         private void Start()
         {
             //Redoボタンが押されたらFunctionステートを変更
-            _redoButtonObj.OnTriggerEnterAsObservable()
-                .Subscribe(_ => { _paintFunctionState = HpPaintFunctionState.Redo; })
-                .AddTo(this);
+            _redoButtonObj.ActionZoneEvent += args =>
+            {
+                Debug.Log(args.ToString());
+
+                if (args.InteractionT == InteractionType.Enter)
+                {
+                    //ボタンをクリックした時の処理
+                    _paintFunctionState = HpPaintFunctionState.Redo;
+                    Debug.Log("Redo");
+                }
+            };
 
             //Undoボタンが押されたらFunctionステートを変更
-            _undoButtonObj.OnTriggerEnterAsObservable()
-                .Subscribe(_ => { _paintFunctionState = HpPaintFunctionState.Undo; })
-                .AddTo(this);
+            _undoButtonObj.ActionZoneEvent += args =>
+            {
+                if (args.InteractionT == InteractionType.Enter)
+                {
+                    //ボタンをクリックした時の処理
+                    _paintFunctionState = HpPaintFunctionState.Undo;
+                    Debug.Log("Undo");
+                }
+            };
 
             //Undoボタンが押されたらFunctionステートを変更
-            _paintButtonObj.OnTriggerEnterAsObservable()
-                .Subscribe(_ => { _paintFunctionState = HpPaintFunctionState.Paint; })
-                .AddTo(this);
+            _paintButtonObj.ActionZoneEvent += args =>
+            {
+                if (args.InteractionT == InteractionType.Enter)
+                {
+                    //ボタンをクリックした時の処理
+                    _paintFunctionState = HpPaintFunctionState.Paint;
+                    Debug.Log("Paint");
+                }
+            };
 
             //機能のステートに応じて処理を行う
             _inputModule.InputDataObservable
@@ -46,11 +69,13 @@ namespace Hp
                     {
                         case HpPaintFunctionState.Redo:
                             //Redo処理ここに書く
+                            redo(x);
                             //使い終わったら機能のステート未使用に戻す
                             _paintFunctionState = HpPaintFunctionState.NoFunc;
                             break;
                         case HpPaintFunctionState.Undo:
                             //Undo処理ここに書く
+                            undo(x);
                             //使い終わったら機能のステート未使用に戻す
                             _paintFunctionState = HpPaintFunctionState.NoFunc;
                             break;
@@ -63,28 +88,97 @@ namespace Hp
                 .AddTo(this);
         }
 
+        /// <summary>
+        /// Paint機能
+        /// </summary>
+        /// <param name="data">発行されたメッセージの値である構造体</param>
         private void paint(HpInputData data)
         {
-            GameObject tmpObj = new GameObject("tmp");
+             
             switch (data.InputState)
             {
+                //入力した瞬間
                 case HpInputState.InputDown:
-                    //今の状態をペイント機能に変更
-                    _paintFunctionState = HpPaintFunctionState.Paint;
+                    //書き始めたらもうUndoできなくする
+                    foreach (Transform child in _paintTrailRendererParent)
+                    {
+                        if (child.gameObject.activeInHierarchy ==false)
+                        {
+                            Destroy(child);
+                        }
+                    }
+
+                    Debug.Log("PaintStart");
                     //ペイントオブジェクトを生成
-                    tmpObj = Instantiate(_paintTrailRendererPrefab, data.InputPosition, Quaternion.identity);
-                    tmpObj.transform.parent = _paintTrailRendererParent;
+                    _tmpObj = Instantiate(_paintTrailRendererPrefab, data.InputPosition, Quaternion.identity);
+                    _tmpObj.transform.parent = _paintTrailRendererParent;
                     break;
+
+                //入力中
                 case HpInputState.Input:
+                    Debug.Log("Painting");
                     //ペイントオブジェクトを入力位置に追従
-                    tmpObj.transform.position = data.InputPosition;
+                    _tmpObj.transform.position = data.InputPosition;
                     break;
+
+                //入力終了
                 case HpInputState.NoInput:
-                    //ペイント機能を終了
-                    _paintFunctionState = HpPaintFunctionState.NoFunc;
                     //なんか書くことあれば
-                    tmpObj = null;
+                    _tmpObj = null;
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Redo機能
+        /// </summary>
+        /// <param name="data">発行されたメッセージの値である構造体</param>
+        private void redo(HpInputData data)
+        {
+            foreach(Transform child in _paintTrailRendererParent)
+            {
+                if (child.gameObject.activeInHierarchy)
+                {
+                    child.gameObject.SetActive(false);
+                    return;
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Undo機能
+        /// </summary>
+        /// <param name="data">発行されたメッセージの値である構造体</param>
+        private void undo(HpInputData data)
+        {
+            List<Transform> tmpList = new List<Transform>();
+
+            foreach (Transform child in _paintTrailRendererParent)
+            {
+                tmpList.Add(child);
+            }
+
+            //Listを反転させる
+            tmpList.Reverse();
+
+            foreach (Transform child in tmpList)
+            {
+                if (child.gameObject.activeInHierarchy==false)
+                {
+                    child.gameObject.SetActive(true);
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 全部消す
+        /// </summary>
+        private void delete()
+        {
+            foreach (Transform child in _paintTrailRendererParent)
+            {
+                Destroy(child);
             }
         }
     }

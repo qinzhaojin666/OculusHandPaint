@@ -37,6 +37,7 @@ namespace Hp
 
             //指定した手のした座標を構造体にぶち込む
             _inputData.InputPosition = _ovrSkeleton.Bones[(int)_boneId].Transform.position;
+            Debug.Log(_inputData.InputPosition);
 
             //PinchPoseできてるかどうか
             float currentPinchStrength = _ovrHand.GetFingerPinchStrength(_handFingerType);
@@ -46,6 +47,7 @@ namespace Hp
             //入力中
             if (isPinchPose && _isInput)
             {
+                Debug.Log("入力中");
                 _isInput = true;
                 _inputData.InputState = HpInputState.Input;
             }
@@ -53,6 +55,7 @@ namespace Hp
             //入力した瞬間
             if (isPinchPose && _isInput == false)
             {
+                Debug.Log("入力した瞬間");
                 _isInput = true;
                 _inputData.InputState = HpInputState.InputDown;
             }
