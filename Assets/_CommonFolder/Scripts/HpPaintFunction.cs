@@ -16,7 +16,7 @@ namespace Hp
 
         [SerializeField] private GameObject _paintTrailRendererPrefab;
 
-        [SerializeField] private ButtonController _redoButtonObj, _undoButtonObj,_paintButtonObj;
+        [SerializeField] private ButtonController _redoButtonObj, _undoButtonObj, _paintButtonObj;
 
         [Inject] private IHpInputModule _inputModule;
 
@@ -27,40 +27,14 @@ namespace Hp
         private void Start()
         {
             //Redoボタンが押されたらFunctionステートを変更
-            _redoButtonObj.ActionZoneEvent += args =>
-            {
-                Debug.Log(args.ToString());
-
-                if (args.InteractionT == InteractionType.Enter)
-                {
-                    //ボタンをクリックした時の処理
-                    _paintFunctionState = HpPaintFunctionState.Redo;
-                    Debug.Log("Redo");
-                }
-            };
-
+            _redoButtonObj.InteractableStateChanged.AddListener(modeChangeToRedo);
+            
             //Undoボタンが押されたらFunctionステートを変更
-            _undoButtonObj.ActionZoneEvent += args =>
-            {
-                if (args.InteractionT == InteractionType.Enter)
-                {
-                    //ボタンをクリックした時の処理
-                    _paintFunctionState = HpPaintFunctionState.Undo;
-                    Debug.Log("Undo");
-                }
-            };
-
-            //Undoボタンが押されたらFunctionステートを変更
-            _paintButtonObj.ActionZoneEvent += args =>
-            {
-                if (args.InteractionT == InteractionType.Enter)
-                {
-                    //ボタンをクリックした時の処理
-                    _paintFunctionState = HpPaintFunctionState.Paint;
-                    Debug.Log("Paint");
-                }
-            };
-
+            _undoButtonObj.InteractableStateChanged.AddListener(modeChangeToUndo);
+            
+            //Paintボタンが押されたらFunctionステートを変更
+            _paintButtonObj.InteractableStateChanged.AddListener(modeChangeToPaint);
+            
             //機能のステートに応じて処理を行う
             _inputModule.InputDataObservable
                 .Subscribe(x =>
@@ -88,13 +62,50 @@ namespace Hp
                 .AddTo(this);
         }
 
+
+        /// <summary>
+        /// Redoモードに変更
+        /// </summary>
+        /// <param name="obj">リスナー登録時に必要な引数</param>
+        private void modeChangeToRedo(InteractableStateArgs obj)
+        {
+            if (obj.NewInteractableState == InteractableState.ActionState)
+            {
+                _paintFunctionState = HpPaintFunctionState.Redo;
+            }
+        }
+        
+        /// <summary>
+        /// Undoモードに変更
+        /// </summary>
+        /// <param name="obj">リスナー登録時に必要な引数</param>
+        private void modeChangeToUndo(InteractableStateArgs obj)
+        {
+            if (obj.NewInteractableState == InteractableState.ActionState)
+            {
+                _paintFunctionState = HpPaintFunctionState.Undo;
+            }
+        }
+        
+        /// <summary>
+        /// Paintモードに変更
+        /// </summary>
+        /// <param name="obj">リスナー登録時に必要な引数</param>
+        private void modeChangeToPaint(InteractableStateArgs obj)
+        {
+            if (obj.NewInteractableState == InteractableState.ActionState)
+            {
+                _paintFunctionState = HpPaintFunctionState.Paint;
+            }
+        }
+        
         /// <summary>
         /// Paint機能
         /// </summary>
         /// <param name="data">発行されたメッセージの値である構造体</param>
         private void paint(HpInputData data)
         {
-             
+
             switch (data.InputState)
             {
                 //入力した瞬間
@@ -102,7 +113,7 @@ namespace Hp
                     //書き始めたらもうUndoできなくする
                     foreach (Transform child in _paintTrailRendererParent)
                     {
-                        if (child.gameObject.activeInHierarchy ==false)
+                        if (child.gameObject.activeInHierarchy == false)
                         {
                             Destroy(child);
                         }
@@ -135,7 +146,7 @@ namespace Hp
         /// <param name="data">発行されたメッセージの値である構造体</param>
         private void redo(HpInputData data)
         {
-            foreach(Transform child in _paintTrailRendererParent)
+            foreach (Transform child in _paintTrailRendererParent)
             {
                 if (child.gameObject.activeInHierarchy)
                 {
@@ -144,7 +155,7 @@ namespace Hp
                 }
             }
         }
-        
+
         /// <summary>
         /// Undo機能
         /// </summary>
@@ -163,7 +174,7 @@ namespace Hp
 
             foreach (Transform child in tmpList)
             {
-                if (child.gameObject.activeInHierarchy==false)
+                if (child.gameObject.activeInHierarchy == false)
                 {
                     child.gameObject.SetActive(true);
                     return;

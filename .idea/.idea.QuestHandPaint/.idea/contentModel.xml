@@ -8,11 +8,17 @@
         <e p="_CommonFolder" t="Include">
           <e p="Scripts" t="Include">
             <e p="CustomInput.cs" t="Include" />
+            <e p="Enum" t="Include">
+              <e p="HpInputState.cs" t="Include" />
+              <e p="HpPaintFunctionState.cs" t="Include" />
+            </e>
             <e p="HpClickInputProvider.cs" t="Include" />
+            <e p="HpFollowEyeDirection.cs" t="Include" />
             <e p="HpHandInputProvider.cs" t="Include" />
+            <e p="HpInputData.cs" t="Include" />
             <e p="HpInputInstaller.cs" t="Include" />
             <e p="HpPaintFunction.cs" t="Include" />
-            <e p="IHpInputProvider.cs" t="Include" />
+            <e p="IHpInputModule.cs" t="Include" />
           </e>
           <e p="Shaders" t="Include">
             <e p="CustomStandard.shader" t="Include" />
