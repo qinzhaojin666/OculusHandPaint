@@ -105,7 +105,6 @@ namespace Hp
         /// <param name="data">発行されたメッセージの値である構造体</param>
         private void paint(HpInputData data)
         {
-
             switch (data.InputState)
             {
                 //入力した瞬間
@@ -115,7 +114,7 @@ namespace Hp
                     {
                         if (child.gameObject.activeInHierarchy == false)
                         {
-                            Destroy(child);
+                            Destroy(child.gameObject);
                         }
                     }
 
@@ -146,7 +145,17 @@ namespace Hp
         /// <param name="data">発行されたメッセージの値である構造体</param>
         private void redo(HpInputData data)
         {
+            List<Transform> tmpList = new List<Transform>();
+
             foreach (Transform child in _paintTrailRendererParent)
+            {
+                tmpList.Add(child);
+            }
+            
+            //Listを反転させる
+            tmpList.Reverse();
+            
+            foreach (Transform child in tmpList)
             {
                 if (child.gameObject.activeInHierarchy)
                 {
@@ -168,10 +177,7 @@ namespace Hp
             {
                 tmpList.Add(child);
             }
-
-            //Listを反転させる
-            tmpList.Reverse();
-
+            
             foreach (Transform child in tmpList)
             {
                 if (child.gameObject.activeInHierarchy == false)
@@ -189,7 +195,7 @@ namespace Hp
         {
             foreach (Transform child in _paintTrailRendererParent)
             {
-                Destroy(child);
+                Destroy(child.gameObject);
             }
         }
     }
