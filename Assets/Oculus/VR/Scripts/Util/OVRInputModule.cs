@@ -27,6 +27,8 @@ namespace UnityEngine.EventSystems
         [Tooltip("Object which points with Z axis. E.g. CentreEyeAnchor from OVRCameraRig")]
         public Transform rayTransform;
 
+        [SerializeField] private OVRSkeleton _ovrSkeleton;
+        
         public OVRCursor m_Cursor;
 
         [Tooltip("Gamepad button to act as gaze click")]
@@ -600,7 +602,10 @@ namespace UnityEngine.EventSystems
             leftData.Reset();
 
             //Now set the world space ray. This ray is what the user uses to point at UI elements
-            leftData.worldSpaceRay = new Ray(rayTransform.position, rayTransform.forward);
+            Vector3 handStartPos = _ovrSkeleton.Bones[(int) OVRSkeleton.BoneId.Hand_Start].Transform.position;
+            Vector3 handMiddleFingerStartPos = _ovrSkeleton.Bones[(int) OVRSkeleton.BoneId.Hand_Middle1].Transform.position;
+            
+            leftData.worldSpaceRay = new Ray(rayTransform.position,  handMiddleFingerStartPos-handStartPos);
             leftData.scrollDelta = GetExtraScrollDelta();
 
             //Populate some default values

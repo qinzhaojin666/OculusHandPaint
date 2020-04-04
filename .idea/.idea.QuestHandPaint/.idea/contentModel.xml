@@ -14,14 +14,19 @@
             </e>
             <e p="HpClickInputProvider.cs" t="Include" />
             <e p="HpFollowEyeDirection.cs" t="Include" />
+            <e p="HpHandBeam.cs" t="Include" />
             <e p="HpHandInputProvider.cs" t="Include" />
             <e p="HpInputData.cs" t="Include" />
             <e p="HpInputInstaller.cs" t="Include" />
+            <e p="HpJsonDataManager.cs" t="Include" />
+            <e p="HpPaintData.cs" t="Include" />
+            <e p="HpPaintDataWrapper.cs" t="Include" />
             <e p="HpPaintFunction.cs" t="Include" />
             <e p="IHpInputModule.cs" t="Include" />
           </e>
           <e p="Shaders" t="Include">
             <e p="CustomStandard.shader" t="Include" />
+            <e p="Gradation.shader" t="Include" />
             <e p="LitBlink.shader" t="Include" />
             <e p="LitTexBlink.shader" t="Include" />
             <e p="UnlitBlink.shader" t="Include" />
@@ -327,6 +332,7 @@
                 <e p="NetSyncSession.cs" t="Include" />
                 <e p="NetSyncSessionsChangedNotification.cs" t="Include" />
                 <e p="NetSyncSetSessionPropertyResult.cs" t="Include" />
+                <e p="NetSyncVoipAttenuationValue.cs" t="Include" />
                 <e p="NetworkingPeer.cs" t="Include" />
                 <e p="OrgScopedID.cs" t="Include" />
                 <e p="Party.cs" t="Include" />
@@ -685,10 +691,12 @@
               <e p="Editor" t="Include">
                 <e p="Oculus.VR.Scripts.Editor.asmdef" t="Include" />
                 <e p="OVRCustomSkeletonEditor.cs" t="Include" />
+                <e p="OVREditorUtil.cs" t="Include" />
                 <e p="OVRManagerEditor.cs" t="Include" />
                 <e p="OVROverlayDestRectEditor.shader" t="Include" />
                 <e p="OVROverlayEditor.cs" t="Include" />
                 <e p="OVROverlaySrcRectEditor.shader" t="Include" />
+                <e p="OVRProjectConfigEditor.cs" t="Include" />
               </e>
               <e p="OVRBoundary.cs" t="Include" />
               <e p="OVRCameraRig.cs" t="Include" />

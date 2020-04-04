@@ -3,7 +3,7 @@
 Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.  
 
 See SampleFramework license.txt for license terms.  Unless required by applicable law 
-or agreed to in writing, the sample code is provided “AS IS” WITHOUT WARRANTIES OR 
+or agreed to in writing, the sample code is provided ï¿½AS ISï¿½ WITHOUT WARRANTIES OR 
 CONDITIONS OF ANY KIND, either express or implied.  See the license for specific 
 language governing permissions and limitations under the license.
 
@@ -82,6 +82,7 @@ public class LaserPointer : OVRCursor
         lineRenderer.SetPosition(0, _startPoint);
         if (_hitTarget)
         {
+            lineRenderer.enabled = true;
             lineRenderer.SetPosition(1, _endPoint);
             UpdateLaserBeam(_startPoint, _endPoint);
             if (cursorVisual)
@@ -93,7 +94,8 @@ public class LaserPointer : OVRCursor
         else
         {
             UpdateLaserBeam(_startPoint, _startPoint + maxLength * _forward);
-            lineRenderer.SetPosition(1, _startPoint + maxLength * _forward);
+            //lineRenderer.SetPosition(1, _startPoint + maxLength * _forward);
+            lineRenderer.enabled = false;
             if (cursorVisual) cursorVisual.SetActive(false);
         }
     }

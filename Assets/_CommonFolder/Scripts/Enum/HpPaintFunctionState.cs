@@ -11,6 +11,11 @@
         NoFunc,
 
         /// <summary>
+        /// お絵描きモード
+        /// </summary>
+        Paint,
+        
+        /// <summary>
         /// 元に戻すモード
         /// </summary>
         Redo,
@@ -19,10 +24,30 @@
         /// 元に戻したものを元に戻すモード
         /// </summary>
         Undo,
-
+        
         /// <summary>
-        /// お絵描きモード
+        /// 消去モード
         /// </summary>
-        Paint
+        Delete,
+        
+        /// <summary>
+        /// 色選択モード
+        /// </summary>
+        ColorSelect,
+        
+        /// <summary>
+        /// 保存モード
+        /// </summary>
+        Save,
+        
+        /// <summary>
+        /// 読み込みモード
+        /// </summary>
+        Load,
+        
+        /// <summary>
+        /// 非表示モード
+        /// </summary>
+        Close,
     }
 }
