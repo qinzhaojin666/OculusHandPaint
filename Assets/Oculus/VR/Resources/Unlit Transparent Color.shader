@@ -8,6 +8,7 @@ SubShader {
     LOD 100
     Fog {Mode Off}
 
+    Cull off
     ZTest Always
     Blend SrcAlpha OneMinusSrcAlpha
     Color [_Color]

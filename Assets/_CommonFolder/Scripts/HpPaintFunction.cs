@@ -84,13 +84,13 @@ namespace Hp
                             break;
                         case HpPaintFunctionState.Save:
                             //Save処理ここに書く 一度別のUIをかます
-
+                            save();
                             //使い終わったら機能のステート未使用に戻す
                             _paintFunctionState = HpPaintFunctionState.NoFunc;
                             break;
                         case HpPaintFunctionState.Load:
                             //Load処理ここに書く　一度別のUIをかます
-
+                            load();
                             //使い終わったら機能のステート未使用に戻す
                             _paintFunctionState = HpPaintFunctionState.NoFunc;
                             break;
@@ -323,34 +323,59 @@ namespace Hp
             HpPaintData paintData = new HpPaintData();
             
             //Paintオブジェクト(TrailRenderer)のリストを作成
-            List<TrailRenderer> trList = new List<TrailRenderer>();
 
             foreach (Transform child in _paintTrailRendererParent.transform)
             {
+                //TrailRendererの情報を取得
                 TrailRenderer tr = child.GetComponent<TrailRenderer>();
-
-                if (tr != null)
-                {
-                    trList.Add(tr);
-                }
-            }
-            
-            foreach (TrailRenderer element in trList)
-            {
-                int posCount = element.positionCount;
+                int posCount = tr.positionCount;
                 Vector3[] posArray = new Vector3[posCount];
-
-                //全ての頂点を取ってくる
-                int vertCount = element.GetPositions(posArray);
+                int vertCount = tr.GetPositions(posArray);
+                
+                //構造体にTrailRendererの座標を格納
+                paintData.PaintObjectPosition = child.position;
                 
                 //構造体にTrailRendererの頂点座標の配列を格納
                 paintData.PaintVertices = posArray;
 
+                //描画した頂点座標を確認
+                for (int i = 0; i < vertCount; i++)
+                {
+                    Debug.Log(posArray[i]);
+                }
+                
                 //構造体に色情報を格納
+                _materialPropertyBlock.SetColor(_propertyID,tr.material.color);
                 paintData.PaintColor = _materialPropertyBlock.GetColor(_propertyID);
                 
                 //構造体をリストに追加
+                //paintDataWrapper.DataList = new List<HpPaintData>();
                 paintDataWrapper.DataList.Add(paintData);
+            }
+            
+            //シリアライズ
+            HpJsonDataManager.Save(paintDataWrapper);
+        }
+
+        private void load()
+        { 
+            //デシリアライズ
+            HpPaintDataWrapper paintDataWrapper =  HpJsonDataManager.Load();
+
+            foreach (HpPaintData paintData in paintDataWrapper.DataList)
+            {
+                //リストのデータ分Instantiate
+                GameObject paintObj = Instantiate(_paintTrailRendererPrefab, paintData.PaintObjectPosition, Quaternion.identity);
+                paintObj.transform.parent = _paintTrailRendererParent;
+
+                //TrailRenderer再設定
+                TrailRenderer paintObjTrailRenderer = paintObj.GetComponent<TrailRenderer>();
+                
+                paintObjTrailRenderer.SetPositions(paintData.PaintVertices);
+                
+                //Todo 色変え機能実装したらここMaterialPropertyBlockで個々に設定
+                _materialPropertyBlock.SetColor(_propertyID, paintData.PaintColor);
+                paintObjTrailRenderer.SetPropertyBlock(_materialPropertyBlock);
             }
         }
     }

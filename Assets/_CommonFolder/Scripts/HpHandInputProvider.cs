@@ -37,8 +37,7 @@ namespace Hp
 
             //指定した手のした座標を構造体にぶち込む
             _inputData.InputPosition = _ovrSkeleton.Bones[(int)_boneId].Transform.position;
-            Debug.Log(_inputData.InputPosition);
-
+    
             //PinchPoseできてるかどうか
             float currentPinchStrength = _ovrHand.GetFingerPinchStrength(_handFingerType);
             bool isPinching = _ovrHand.GetFingerIsPinching(_handFingerType);
