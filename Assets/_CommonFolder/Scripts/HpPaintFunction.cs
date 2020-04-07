@@ -9,7 +9,6 @@ namespace Hp
     /// <summary>
     /// 適当にオブジェクト作ってアタッチ
     /// </summary>
-    [RequireComponent(typeof(TrailRenderer))]
     public class HpPaintFunction : MonoBehaviour
     {
         [SerializeField] private Transform _paintTrailRendererParent;
@@ -349,7 +348,6 @@ namespace Hp
                 paintData.PaintColor = _materialPropertyBlock.GetColor(_propertyID);
                 
                 //構造体をリストに追加
-                //paintDataWrapper.DataList = new List<HpPaintData>();
                 paintDataWrapper.DataList.Add(paintData);
             }
             
@@ -358,7 +356,10 @@ namespace Hp
         }
 
         private void load()
-        { 
+        {
+            //現在表示中の絵は消える
+            delete();
+            
             //デシリアライズ
             HpPaintDataWrapper paintDataWrapper =  HpJsonDataManager.Load();
 
@@ -367,13 +368,17 @@ namespace Hp
                 //リストのデータ分Instantiate
                 GameObject paintObj = Instantiate(_paintTrailRendererPrefab, paintData.PaintObjectPosition, Quaternion.identity);
                 paintObj.transform.parent = _paintTrailRendererParent;
-
-                //TrailRenderer再設定
+                
+                //==============================================================================================================
+                //　TrailRenderer再設定
+                //==============================================================================================================
+                
                 TrailRenderer paintObjTrailRenderer = paintObj.GetComponent<TrailRenderer>();
                 
-                paintObjTrailRenderer.SetPositions(paintData.PaintVertices);
+                //全ての頂点を復元
+                paintObjTrailRenderer.AddPositions(paintData.PaintVertices);
                 
-                //Todo 色変え機能実装したらここMaterialPropertyBlockで個々に設定
+                //色情報を復元
                 _materialPropertyBlock.SetColor(_propertyID, paintData.PaintColor);
                 paintObjTrailRenderer.SetPropertyBlock(_materialPropertyBlock);
             }

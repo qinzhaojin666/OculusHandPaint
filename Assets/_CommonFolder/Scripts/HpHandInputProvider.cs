@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UniRx;
+using UnityEngine.XR;
 
 namespace Hp
 {
@@ -32,12 +33,18 @@ namespace Hp
 
         private void Update()
         {
+            //デバイスの接続を確認
+            if (!isOnDevice())
+            {
+                return;
+            }
+            
             //入力なし
             _inputData.InputState = HpInputState.NoInput;
 
             //指定した手のした座標を構造体にぶち込む
             _inputData.InputPosition = _ovrSkeleton.Bones[(int)_boneId].Transform.position;
-    
+            
             //PinchPoseできてるかどうか
             float currentPinchStrength = _ovrHand.GetFingerPinchStrength(_handFingerType);
             bool isPinching = _ovrHand.GetFingerIsPinching(_handFingerType);
@@ -67,6 +74,19 @@ namespace Hp
 
             //構造体をのせてメッセージを発行
             _inputDataSubject.OnNext(_inputData);
+        }
+        
+        //デバイス上でのプレイかどうか
+        private bool isOnDevice()
+        {
+            if (XRDevice.isPresent)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

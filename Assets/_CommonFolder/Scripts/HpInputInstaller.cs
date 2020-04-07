@@ -9,7 +9,8 @@ namespace Hp
     /// </summary>
     public class HpInputInstaller : MonoInstaller<HpInputInstaller>
     {
-        [SerializeField] private GameObject handImput;
+        [SerializeField] private GameObject handInput;
+        [SerializeField] private GameObject clickInput;
 
         public override void InstallBindings()
         {
@@ -17,7 +18,7 @@ namespace Hp
             Container
                 .Bind<IHpInputModule>()
                 .To<HpHandInputProvider>()
-                .FromComponentOn(handImput)
+                .FromComponentOn(handInput)
                 .AsCached()
                 .When(_ => isOnDevice());
 
@@ -25,6 +26,7 @@ namespace Hp
             Container
                 .Bind<IHpInputModule>()
                 .To<HpClickInputProvider>()
+                .FromComponentOn(clickInput)
                 .AsCached()
                 .When(_ => !isOnDevice());
         }
