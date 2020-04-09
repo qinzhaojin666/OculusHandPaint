@@ -366,9 +366,8 @@ namespace Hp
             foreach (HpPaintData paintData in paintDataWrapper.DataList)
             {
                 //リストのデータ分Instantiate
-                GameObject paintObj = Instantiate(_paintTrailRendererPrefab, paintData.PaintObjectPosition, Quaternion.identity);
-                paintObj.transform.parent = _paintTrailRendererParent;
-                
+                GameObject paintObj = Instantiate(_paintTrailRendererPrefab, paintData.PaintObjectPosition ,Quaternion.identity,_paintTrailRendererParent);
+               
                 //==============================================================================================================
                 //　TrailRenderer再設定
                 //==============================================================================================================
